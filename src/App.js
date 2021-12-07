@@ -5,7 +5,7 @@ function App() {
   return (
     <div className="App">
       <Navbar bg="light">
-        <Navbar.Brand>Barchartly</Navbar.Brand>
+        <Navbar.Brand>Barchart</Navbar.Brand>
       </Navbar>
       <Container>
         <ChartWrapper />
