@@ -15,12 +15,11 @@ export default class D3Chart {
       .append("g")
       .attr("transform", `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`);
 
-    vis.svg
+    vis.xLabel = vis.svg
       .append("text")
       .attr("x", WIDTH / 2)
       .attr("y", HEIGHT + 50)
-      .attr("text-anchor", "middle")
-      .text("The world's tallest men");
+      .attr("text-anchor", "middle");
 
     vis.svg
       .append("text")
@@ -40,19 +39,24 @@ export default class D3Chart {
       d3.json("https://udemy-react-d3.firebaseio.com/tallest_men.json"),
       d3.json("https://udemy-react-d3.firebaseio.com/tallest_women.json"),
     ]).then((datasets) => {
-      const [men, women] = datasets;
-      let flag = true;
-      vis.data = men;
-      vis.update();
-      d3.interval(() => {
-        vis.data = flag ? men : women;
-        vis.update();
-        flag = !flag;
-      }, 1000);
+      // const [men, women] = datasets;
+      // let flag = true;
+      // vis.data = women;
+      // vis.update();
+      // d3.interval(() => {
+      //   vis.data = flag ? men : women;
+      //   vis.update();
+      //   flag = !flag;
+      // }, 1000);
+      vis.menData = datasets[0];
+      vis.womenData = datasets[1];
+      vis.update("men");
     });
   }
-  update() {
+  update(gender) {
     const vis = this;
+    vis.data = gender === "men" ? vis.menData : vis.womenData;
+    vis.xLabel.text(`The world's tallest ${gender}`);
     const y = d3
       .scaleLinear()
       .domain([
@@ -67,19 +71,27 @@ export default class D3Chart {
       .padding(0.4);
 
     const xAxisCall = d3.axisBottom(x);
-    vis.xAxisGroup.call(xAxisCall);
+    vis.xAxisGroup.transition().duration(500).call(xAxisCall);
 
     const yAxisCall = d3.axisLeft(y);
-    vis.yAxisGroup.call(yAxisCall);
+    vis.yAxisGroup.transition().duration(500).call(yAxisCall);
 
     //DATA JOIN
     const rects = vis.svg.selectAll("rect").data(vis.data);
 
     //EXIT
-    rects.exit().remove();
+    rects
+      .exit()
+      .transition()
+      .duration(500)
+      .attr("height", 0)
+      .attr("y", HEIGHT)
+      .remove();
 
     //UPDATE
     rects
+      .transition()
+      .duration(500)
       .attr("x", (d) => x(d.name))
       .attr("y", (d) => y(d.height))
       .attr("width", x.bandwidth)
@@ -90,9 +102,12 @@ export default class D3Chart {
       .enter()
       .append("rect")
       .attr("x", (d) => x(d.name))
-      .attr("y", (d) => y(d.height))
       .attr("width", x.bandwidth)
-      .attr("height", (d) => HEIGHT - y(d.height))
-      .attr("fill", "hotpink");
+      .attr("fill", "hotpink")
+      .attr("y", HEIGHT)
+      .transition()
+      .duration(500)
+      .attr("y", (d) => y(d.height))
+      .attr("height", (d) => HEIGHT - y(d.height));
   }
 }
