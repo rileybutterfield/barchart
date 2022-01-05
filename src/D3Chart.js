@@ -39,15 +39,6 @@ export default class D3Chart {
       d3.json("https://udemy-react-d3.firebaseio.com/tallest_men.json"),
       d3.json("https://udemy-react-d3.firebaseio.com/tallest_women.json"),
     ]).then((datasets) => {
-      // const [men, women] = datasets;
-      // let flag = true;
-      // vis.data = women;
-      // vis.update();
-      // d3.interval(() => {
-      //   vis.data = flag ? men : women;
-      //   vis.update();
-      //   flag = !flag;
-      // }, 1000);
       vis.menData = datasets[0];
       vis.womenData = datasets[1];
       vis.update("men");
